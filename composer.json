@@ -12,11 +12,15 @@
 	"license" : "MIT",
 	"require" : {
 		"php" : "^5.5.0 || ~7.0.0 || ~7.1.0 || ~7.2.0 || ~7.3.0",
-    "voyteck/extlibs" : "~1.0"
+		"voyteck/extlibs" : "~1.0",
+		"zendframework/zend-view" : "~2.11"
 	},
 	"autoload" : {
 		"psr-4" : {
 			"Voyteck\\" : "src/"
 		}
+	},
+	"config" : {
+		"vendor-dir" : "vendor/"
 	}
 }
