@@ -1,7 +1,7 @@
 <?php
-namespace Voyteck\View\Helper;
+namespace Voyteck\VExtControllers\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
+use \Zend\View\Helper\AbstractHelper;
 
 class configValueHelper extends AbstractHelper {
 

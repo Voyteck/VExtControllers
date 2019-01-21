@@ -1,5 +1,5 @@
 <?php
-namespace Voyteck\Controller;
+namespace Voyteck\VExtControllers\Controller;
 
 use \Zend\Mvc\MvcEvent;
 use \Zend\Mvc\Controller\AbstractActionController;
@@ -9,13 +9,9 @@ abstract class AbstractController extends AbstractActionController {
 
   const LAZYFACTORY_INCLUDE_SERVICELOCATOR = 'serviceLocator';
 
-  protected $authService;
-
   const PARAMTYPES_POST 	= 1;
   const PARAMTYPES_GET 		= 2;
   const PARAMTYPES_PARAMS 	= 4;
-
-  const LAZYFACTORY_INCLUDE_TRANSLATOR = 'Translator';
 
   /**
    * Returns appropriate method results depending on type of request:
