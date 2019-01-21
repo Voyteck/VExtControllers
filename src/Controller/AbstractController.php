@@ -1,9 +1,9 @@
 <?php
 namespace Voyteck\Controller;
 
-use Zend\Mvc\MvcEvent;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
+use \Zend\Mvc\MvcEvent;
+use \Zend\Mvc\Controller\AbstractActionController;
+use \Zend\View\Model\JsonModel;
 
 abstract class AbstractController extends AbstractActionController {
 
@@ -26,12 +26,12 @@ abstract class AbstractController extends AbstractActionController {
    * @return NULL[]
    */
   protected function getMethodTypesConfig() {
-  	return array(
+  	return [
   		'Action' 			=> function(AbstractController $object, string $methodName) {
   			$methodName .= 'Action';
   			$paramsValidationResult = $object->validateParameters($methodName);
 	  		if ($paramsValidationResult === false) {
-	  			$this->err('At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString());
+	  			trigger_error('At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString(), E_USER_ERROR);
 	  			return $object->notFoundAction();
 	  		}
 //   			return parent::onDispatch($object->getEvent());
@@ -44,7 +44,7 @@ abstract class AbstractController extends AbstractActionController {
 	  		$paramsArray = array();
 	  		$paramsValidationResult = $object->validateParameters($methodName);
 	  		if ($paramsValidationResult === false) {
-	  			$this->err('At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString());
+	  			trigger_error('At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString(), E_USER_ERROR);
 	  			$response = $this->getResponse();
 	  			$response->setContent('At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString());
 	  			$response->setStatusCode(400);
@@ -62,25 +62,7 @@ abstract class AbstractController extends AbstractActionController {
   		    return $returnedValue;
   		},
 
-  		'Confirm'			=> function(AbstractController $object, string $methodName) {
-  			$methodName .= 'Confirm';
-  			if ($object->getEvent()->getRouteMatch()->getMatchedRouteName() != 'confirm') {
-  				$this->err('Trying to access ' . $object->getRequest()->getUriString() . ' without Confirm object');
-  				return $object->notFoundAction();
-  			}
-
-  			$paramsArray = array();
-  			$paramsValidationResult = $object->validateParameters($methodName, AbstractController::PARAMTYPES_PARAMS);
-  			if ($paramsValidationResult === false) {
-  				$this->err('At least one of the mandatory parameters was not provided by Confirm object while performing ' . $object->getRequest()->getUriString());
-  				return $object->notFoundAction();
-  			}
-
-  			return call_user_func_array(array($object, $methodName), $paramsValidationResult);
-
-  		},
-
-  	);
+  	];
   }
 
   /**
@@ -118,12 +100,10 @@ abstract class AbstractController extends AbstractActionController {
 	    if(\Voyteck\ExtLibs::byteOn($paramTypesChecked, static::PARAMTYPES_GET) && $this->getRequest()->getQuery($parameterName) !== null) {
 	        $queryParam = true;
             $paramsArray[] = $this->getRequest()->getQuery($parameterName);
-            $this->debug('found GET param for ' . $parameterName);
   		}
   		if(\Voyteck\ExtLibs::byteOn($paramTypesChecked, static::PARAMTYPES_POST) && $this->getRequest()->getPost($parameterName) !== null) {
 	        $postParam = true;
 	        $paramsArray[] = $this->getRequest()->getPost($parameterName);
-	        $this->debug('found POST param for ' . $parameterName);
   		}
   		if(\Voyteck\ExtLibs::byteOn($paramTypesChecked, static::PARAMTYPES_PARAMS) && $this->params('params')[$parameterName] !== null) {
   			$paramParam = true;
@@ -131,7 +111,7 @@ abstract class AbstractController extends AbstractActionController {
   		}
 
   		if (!($queryParam || $postParam || $paramParam) && $key < $ajaxMethodReflection->getNumberOfRequiredParameters()) {
-  			$this->err('Parameter ' . $parameterName . ' not provided for method ' . $methodName);
+  			trigger_error('Parameter ' . $parameterName . ' not provided for method ' . $methodName, E_USER_ERROR);
   			return false;
   		}
   	}
