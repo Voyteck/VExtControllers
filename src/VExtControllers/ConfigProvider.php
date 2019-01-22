@@ -11,11 +11,12 @@ class ConfigProvider
      */
     public function __invoke() {
         return [
-            'controllers' => [
-                'abstract_factories' => [
-                    \Voyteck\VExtControllers\Factory\LazyControllerFactory::class
-                ]
-            ]
+            'testComposerConfig' => "testComposerConfigValue",
+//             'controllers' => [
+//                 'abstract_factories' => [
+//                     \Voyteck\VExtControllers\Factory\LazyControllerFactory::class
+//                 ]
+//             ]
         ];
     }
 }
