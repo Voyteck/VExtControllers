@@ -27,5 +27,10 @@
 	},
 	"config" : {
 		"vendor-dir" : "vendor/"
+	},
+	"extra" : {
+		"zf" : {
+			"config-provider" : "Voyteck\\VExtControllers\\ConfigProvider"
+		}
 	}
 }
