@@ -5,7 +5,6 @@ namespace Voyteck\VExtControllers;
 class ConfigProvider
 {
     /**
-     * Retrieve zend-db default configuration.
      *
      * @return array
      */
