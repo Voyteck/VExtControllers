@@ -2,7 +2,7 @@
 namespace Voyteck\VExtControllers\Factory;
 
 use \Zend\ServiceManager\Factory\AbstractFactoryInterface;
-use Voyteck\VExtMvc\Factory\AbstractLazyFactory;
+use \Voyteck\VExtMvc\Factory\AbstractLazyFactory;
 
 
 /**
