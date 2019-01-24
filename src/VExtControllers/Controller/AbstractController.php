@@ -17,7 +17,6 @@ abstract class AbstractController extends AbstractActionController {
    * Returns appropriate method results depending on type of request:
    *    [method_name]Action - standard method
    *    [method_name]Ajax - for Ajax calls
-   *    [method_name]Confirm - for Confirm calls @todo documentation
    * 
    * @return NULL[]
    */
@@ -75,7 +74,7 @@ abstract class AbstractController extends AbstractActionController {
    * @param int $paramTypes
    * @return boolean|NULL[]
    */
-  public function validateParameters(string $methodName, int $paramTypes = AbstractController::PARAMTYPES_GET + AbstractController::PARAMTYPES_POST + AbstractController::PARAMTYPES_PARAMS) {
+  protected function validateParameters(string $methodName, int $paramTypes = AbstractController::PARAMTYPES_GET + AbstractController::PARAMTYPES_POST + AbstractController::PARAMTYPES_PARAMS) {
   	$ajaxMethodReflection = new \ReflectionMethod($this, $methodName);
   	$paramsArray = array();
   	foreach($ajaxMethodReflection->getParameters() as $key => $parameter) {
@@ -114,7 +113,7 @@ abstract class AbstractController extends AbstractActionController {
   	return $paramsArray;
   }
 
-  public static function getMethodFromMasked(string $action, string $postfix = 'Action') {
+  protected static function getMethodFromMasked(string $action, string $postfix = 'Action') {
     $method = static::getMethodFromAction($action);
     if ($postfix == 'Action')
       return $method;
@@ -141,7 +140,6 @@ abstract class AbstractController extends AbstractActionController {
 		}
 		else
 			$functionNotFound = true;
-
 
 	if ($functionNotFound)
 		throw new \Zend\Mvc\Exception\DomainException('No function found for the action ' . $action);
