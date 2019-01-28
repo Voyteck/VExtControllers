@@ -12,6 +12,9 @@ abstract class AbstractController extends AbstractActionController {
   const PARAMTYPES_POST 	= 1;
   const PARAMTYPES_GET 		= 2;
   const PARAMTYPES_PARAMS 	= 4;
+  
+  const PARAMTYPES_GET_PREFIX = "get_";
+  const PARAMTYPES_POST_PREFIX = "post_";
 
   /**
    * Returns appropriate method results depending on type of request:
@@ -81,13 +84,13 @@ abstract class AbstractController extends AbstractActionController {
   		$queryParam = $postParam = $paramParam = false;
   		$parameterName = $parameter->name;
   		
-  		if (strpos($parameterName, 'get_') === 0) {
-  		    $paramTypesChecked = AbstractController::PARAMTYPES_GET;
-  		    $parameterName = substr($parameterName, 4);
+  		if (strpos($parameterName, self::PARAMTYPES_GET_PREFIX) === 0) {
+  		    $paramTypesChecked = self::PARAMTYPES_GET;
+  		    $parameterName = substr($parameterName, strlen(self::PARAMTYPES_GET_PREFIX));
   		}
-	    elseif (strpos($parameterName, 'post_') === 0) {
-	        $paramTypesChecked = AbstractController::PARAMTYPES_POST;
-	        $parameterName = substr($parameterName, 6);
+	    elseif (strpos($parameterName, self::PARAMTYPES_POST_PREFIX) === 0) {
+	        $paramTypesChecked = self::PARAMTYPES_POST;
+	        $parameterName = substr($parameterName, strlen(self::PARAMTYPES_POST_PREFIX));
 	    }
 	    else 
 	        $paramTypesChecked = $paramTypes;
