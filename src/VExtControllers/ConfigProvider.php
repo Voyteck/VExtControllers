@@ -1,12 +1,10 @@
 <?php
 
-
-
 namespace Voyteck\VExtControllers;
 
 /**
  * @todo Needs to be adjusted hence right now it is not working - abstract factories needs to be added in application config files
- * 
+ *
  * @author zielinw1
  *
  */

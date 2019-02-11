@@ -12,7 +12,7 @@ abstract class AbstractController extends AbstractActionController {
   const PARAMTYPES_POST 	= 1;
   const PARAMTYPES_GET 		= 2;
   const PARAMTYPES_PARAMS 	= 4;
-  
+
   const PARAMTYPES_GET_PREFIX = "get_";
   const PARAMTYPES_POST_PREFIX = "post_";
 
@@ -20,7 +20,7 @@ abstract class AbstractController extends AbstractActionController {
    * Returns appropriate method results depending on type of request:
    *    [method_name]Action - standard method
    *    [method_name]Ajax - for Ajax calls
-   * 
+   *
    * @return NULL[]
    */
   protected function getMethodTypesConfig() {
@@ -53,10 +53,10 @@ abstract class AbstractController extends AbstractActionController {
 	  		$returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
 	  		if (is_array($returnedValue))
 	  		    return new JsonModel($returnedValue);
-	  		
+
   		    if (is_bool($returnedValue))
   		        return new JsonModel(['success' => $returnedValue]);
-  		    
+
   		    return $returnedValue;
   		},
 
@@ -71,8 +71,8 @@ abstract class AbstractController extends AbstractActionController {
    *        parameters prefixed by post_* can be only passed using POST method;
    *        parameters prefixed by get_* can be only passed using GET method
    *        for prefixed parameters the real parameter tha should be passed is the one WITHOUT PREFIX
-   *    
-   * 
+   *
+   *
    * @param string $methodName
    * @param int $paramTypes
    * @return boolean|NULL[]
@@ -83,7 +83,7 @@ abstract class AbstractController extends AbstractActionController {
   	foreach($ajaxMethodReflection->getParameters() as $key => $parameter) {
   		$queryParam = $postParam = $paramParam = false;
   		$parameterName = $parameter->name;
-  		
+
   		if (strpos($parameterName, self::PARAMTYPES_GET_PREFIX) === 0) {
   		    $paramTypesChecked = self::PARAMTYPES_GET;
   		    $parameterName = substr($parameterName, strlen(self::PARAMTYPES_GET_PREFIX));
@@ -92,9 +92,9 @@ abstract class AbstractController extends AbstractActionController {
 	        $paramTypesChecked = self::PARAMTYPES_POST;
 	        $parameterName = substr($parameterName, strlen(self::PARAMTYPES_POST_PREFIX));
 	    }
-	    else 
+	    else
 	        $paramTypesChecked = $paramTypes;
-	    
+
 	    if(\Voyteck\ExtLibs::byteOn($paramTypesChecked, static::PARAMTYPES_GET) && $this->getRequest()->getQuery($parameterName) !== null) {
 	        $queryParam = true;
             $paramsArray[] = $this->getRequest()->getQuery($parameterName);
@@ -151,10 +151,10 @@ abstract class AbstractController extends AbstractActionController {
     return $actionResponse;
   }
 
-  
+
   /**
    * Retrieves file that has been uploaded using AJAX transfer
-   * 
+   *
    * @param string $fileElementName     Name of element that is holding the transferred file needs to be provided - defaults to 'uploaded-file'
    * @param array $postData             Contains  list of other fields taht are sent together with the file (they will be stored in Hidden files of the form)
    * @return \Zend\Form\Form|boolean    Returns FALSE if the form could not be correctly parsed/validated
@@ -170,11 +170,11 @@ abstract class AbstractController extends AbstractActionController {
           $this->getRequest()->getPost()->toArray(),
           $this->getRequest()->getFiles()->toArray()
       ));
-      
+
       if ($form->isValid())
           return $form;
       else
           return false;
-       
+
   }
 }
