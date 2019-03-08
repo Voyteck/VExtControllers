@@ -4,6 +4,7 @@ namespace Voyteck\VExtControllers\Controller;
 use \Zend\Mvc\MvcEvent;
 use \Zend\Mvc\Controller\AbstractActionController;
 use \Zend\View\Model\JsonModel;
+use Zend\Http\Response;
 
 abstract class AbstractController extends AbstractActionController {
 
