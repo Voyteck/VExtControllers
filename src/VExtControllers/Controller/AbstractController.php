@@ -15,6 +15,18 @@ abstract class AbstractController extends AbstractActionController {
 
   const PARAMTYPES_GET_PREFIX = "get_";
   const PARAMTYPES_POST_PREFIX = "post_";
+  
+  protected function getAjaxResponse(int $responseCode, $additionalMsg = null, $triggerError = true) {
+      if ($triggerError)
+          trigger_error('AJAX reponse with code ' . $responseCode . (is_null($additionalMsg) ? '' : ' - ' . $additionalMsg), E_USER_ERROR);
+          
+          $response = $this->getResponse();
+          $response->setStatusCode($responseCode);
+          if (!is_null($additionalMsg))
+              $response->setContent($additionalMsg);
+              
+              return $response;
+  }
 
   /**
    * Returns appropriate method results depending on type of request:
@@ -37,27 +49,25 @@ abstract class AbstractController extends AbstractActionController {
   		},
 
   		'Ajax'				=> function(AbstractController $object, string $methodName) {
-	  		$methodName .= 'Ajax';
-
-	  		$paramsArray = array();
-	  		$paramsValidationResult = $object->validateParameters($methodName);
-	  		if ($paramsValidationResult === false) {
-	  			trigger_error('At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString(), E_USER_ERROR);
-	  			$response = $this->getResponse();
-	  			$response->setContent('At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString());
-	  			$response->setStatusCode(400);
-	  			return $response;
-	  			//return $object->notFoundAction();
-	  		}
-
-	  		$returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
-	  		if (is_array($returnedValue))
-	  		    return new JsonModel($returnedValue);
-
-  		    if (is_bool($returnedValue))
-  		        return new JsonModel(['success' => $returnedValue]);
-
-  		    return $returnedValue;
+  		$methodName .= 'Ajax';
+  		
+  		$paramsArray = array();
+  		
+  		if (!$object->getRequest()->isXmlHttpRequest())
+  		    return $this->getAjaxResponse(Response::STATUS_CODE_400, $object->getRequest()->getUriString() . ' can be called only using XML HTTP Request (AJAX)');
+  		    
+  		    $paramsValidationResult = $object->validateParameters($methodName);
+  		    if ($paramsValidationResult === false)
+  		        return $this->getAjaxResponse(Response::STATUS_CODE_400, 'At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString());
+  		        
+  		        $returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
+  		        if (is_array($returnedValue))
+  		            return new JsonModel($returnedValue);
+  		            
+  		            if (is_bool($returnedValue))
+  		                return new JsonModel(['success' => $returnedValue]);
+  		                
+  		                return $returnedValue;
   		},
 
   	];
