@@ -52,8 +52,6 @@ abstract class AbstractController extends AbstractActionController {
   		'Ajax'				=> function(AbstractController $object, string $methodName) {
   		$methodName .= 'Ajax';
   		
-  		$paramsArray = array();
-  		
   		if (!$object->getRequest()->isXmlHttpRequest())
   		    return $this->getAjaxResponse(Response::STATUS_CODE_400, $object->getRequest()->getUriString() . ' can be called only using XML HTTP Request (AJAX)');
   		    
@@ -61,14 +59,14 @@ abstract class AbstractController extends AbstractActionController {
   		    if ($paramsValidationResult === false)
   		        return $this->getAjaxResponse(Response::STATUS_CODE_400, 'At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString());
   		        
-  		        $returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
-  		        if (is_array($returnedValue))
-  		            return new JsonModel($returnedValue);
+	        $returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
+	        if (is_array($returnedValue))
+	            return new JsonModel($returnedValue);
   		            
-  		            if (is_bool($returnedValue))
-  		                return new JsonModel(['success' => $returnedValue]);
+            if (is_bool($returnedValue))
+                return new JsonModel(['success' => $returnedValue]);
   		                
-  		                return $returnedValue;
+            return $returnedValue;
   		},
 
   	];
@@ -106,15 +104,15 @@ abstract class AbstractController extends AbstractActionController {
 	    else
 	        $paramTypesChecked = $paramTypes;
 
-	    if(\Voyteck\ExtLibs::byteOn($paramTypesChecked, static::PARAMTYPES_GET) && $this->getRequest()->getQuery($parameterName) !== null) {
+	    if(\Voyteck\ExtLibs::byteOn($paramTypesChecked, self::PARAMTYPES_GET) && $this->getRequest()->getQuery($parameterName) !== null) {
 	        $queryParam = true;
             $paramsArray[] = $this->getRequest()->getQuery($parameterName);
   		}
-  		if(\Voyteck\ExtLibs::byteOn($paramTypesChecked, static::PARAMTYPES_POST) && $this->getRequest()->getPost($parameterName) !== null) {
+  		if(\Voyteck\ExtLibs::byteOn($paramTypesChecked, self::PARAMTYPES_POST) && $this->getRequest()->getPost($parameterName) !== null) {
 	        $postParam = true;
 	        $paramsArray[] = $this->getRequest()->getPost($parameterName);
   		}
-  		if(\Voyteck\ExtLibs::byteOn($paramTypesChecked, static::PARAMTYPES_PARAMS) && $this->params('params')[$parameterName] !== null) {
+  		if(\Voyteck\ExtLibs::byteOn($paramTypesChecked, self::PARAMTYPES_PARAMS) && $this->params('params')[$parameterName] !== null) {
   			$paramParam = true;
   			$paramsArray[] = $this->params('params')[$parameterName];
   		}
@@ -131,15 +129,15 @@ abstract class AbstractController extends AbstractActionController {
     $method = static::getMethodFromAction($action);
     if ($postfix == 'Action')
       return $method;
-    else {
-      $method = substr($method, 0, -strlen('Action'));
-      $method .= $postfix;
-      return $method;
-    }
+    
+    $method = substr($method, 0, -strlen('Action'));
+    $method .= $postfix;
+    
+    return $method;
   }
 
-  public function onDispatch(MvcEvent $e) {
-    $routeMatch = $e->getRouteMatch();
+  public function onDispatch(MvcEvent $event) {
+    $routeMatch = $event->getRouteMatch();
     if (!$routeMatch)
     	throw new \Zend\Mvc\Exception\DomainException('Missing route matches; unsure how to retrieve action');
 
@@ -158,7 +156,7 @@ abstract class AbstractController extends AbstractActionController {
 	if ($functionNotFound)
 		throw new \Zend\Mvc\Exception\DomainException('No function found for the action ' . $action);
 
-    $e->setResult($actionResponse);
+    $event->setResult($actionResponse);
     return $actionResponse;
   }
 
