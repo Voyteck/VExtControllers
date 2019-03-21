@@ -172,7 +172,7 @@ abstract class AbstractController extends AbstractActionController {
       $form = new \Zend\Form\Form();
       $fileElement = new \Zend\Form\Element\File($fileElementName);
       $form->add($fileElement);
-      if (sizeof($postData) > 0)
+      if (count($postData) > 0)
           foreach($postData as $fieldName)
                   $form->add(new \Zend\Form\Element\Hidden($fieldName));
       $form->setData(array_merge_recursive(
