@@ -19,11 +19,11 @@ abstract class AbstractController extends AbstractActionController {
   
   protected function getAjaxResponse(int $responseCode, $additionalMsg = null, $triggerError = true) {
       if ($triggerError)
-          trigger_error('AJAX reponse with code ' . $responseCode . (is_null($additionalMsg) ? '' : ' - ' . $additionalMsg), E_USER_ERROR);
+          trigger_error('AJAX reponse with code ' . $responseCode . ($additionalMsg === null ? '' : ' - ' . $additionalMsg), E_USER_ERROR);
           
           $response = $this->getResponse();
           $response->setStatusCode($responseCode);
-          if (!is_null($additionalMsg))
+          if ($additionalMsg !== null)
               $response->setContent($additionalMsg);
               
               return $response;
