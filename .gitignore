@@ -24,6 +24,7 @@ demos/
 extras/documentation
 .buildpath
 .project
-.settings/org.eclipse.php.core.prefs
+.settings/
 .settings
 .gitignore
+*.md
