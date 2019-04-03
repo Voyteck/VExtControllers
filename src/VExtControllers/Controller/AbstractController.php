@@ -90,8 +90,8 @@ abstract class AbstractController extends AbstractActionController {
   	$ajaxMethodReflection = new \ReflectionMethod($this, $methodName);
   	$paramsArray = array();
   	foreach($ajaxMethodReflection->getParameters() as $key => $parameter) {
-  		$queryParam = $postParam = $paramParam = false;
-  		$parameterName = $parameter->name;
+  	    $queryParam = $postParam = $paramParam = $defaultParam = false;
+  	    $parameterName = $parameter->getName();
 
   		if (strpos($parameterName, self::PARAMTYPES_GET_PREFIX) === 0) {
   		    $paramTypesChecked = self::PARAMTYPES_GET;
@@ -117,9 +117,14 @@ abstract class AbstractController extends AbstractActionController {
   			$paramsArray[] = $this->params('params')[$parameterName];
   		}
 
-  		if (!($queryParam || $postParam || $paramParam) && $key < $ajaxMethodReflection->getNumberOfRequiredParameters()) {
-  			trigger_error('Parameter ' . $parameterName . ' not provided for method ' . $methodName, E_USER_ERROR);
-  			return false;
+  		if (!($queryParam || $postParam || $paramParam) && $parameter->isDefaultValueAvailable()) {
+  		    $defaultParam = true;
+  		    $paramsArray[] = $parameter->getDefaultValue();
+  		}
+  		
+  		if (!($queryParam || $postParam || $paramParam || $defaultParam)) {
+  		    trigger_error('Mandatory parameter ' . $parameterName . ' (' . $parameter->getName() . ') not provided for method ' . $methodName, E_USER_ERROR);
+  		    return false;
   		}
   	}
   	return $paramsArray;
