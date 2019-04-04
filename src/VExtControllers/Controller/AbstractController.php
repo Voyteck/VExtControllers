@@ -89,7 +89,7 @@ abstract class AbstractController extends AbstractActionController {
   protected function validateParameters(string $methodName, int $paramTypes = AbstractController::PARAMTYPES_GET + AbstractController::PARAMTYPES_POST + AbstractController::PARAMTYPES_PARAMS) {
   	$ajaxMethodReflection = new \ReflectionMethod($this, $methodName);
   	$paramsArray = array();
-  	foreach($ajaxMethodReflection->getParameters() as $key => $parameter) {
+  	foreach($ajaxMethodReflection->getParameters() as $parameter) {
   	    $queryParam = $postParam = $paramParam = $defaultParam = false;
   	    $parameterName = $parameter->getName();
 
@@ -123,7 +123,7 @@ abstract class AbstractController extends AbstractActionController {
   		}
   		
   		if (!($queryParam || $postParam || $paramParam || $defaultParam)) {
-  		    trigger_error('Mandatory parameter ' . $parameterName . ' (' . $parameter->getName() . ') not provided for method ' . $methodName, E_USER_ERROR);
+  		    throw new \Zend\Mvc\Exception\InvalidArgumentException('Mandatory parameter ' . $parameterName . ' (' . $parameter->getName() . ') not provided for method ' . $methodName, E_USER_ERROR);
   		    return false;
   		}
   	}
