@@ -61,7 +61,7 @@ abstract class AbstractController extends AbstractActionController {
   		    
   		    try {
 	           $returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
-  		    } catch (\Exception $e) {
+  		    } catch (\Exception $e) {  
 //   		        if ($exceptionMethodTrace)
 //   		            $message = $e->getTraceAsString();
 //   		        else 
