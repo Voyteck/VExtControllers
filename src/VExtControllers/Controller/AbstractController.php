@@ -42,7 +42,7 @@ abstract class AbstractController extends AbstractActionController {
       ];
   }
   
-  protected function getExceptionMessage(string $methodType) {
+  protected function getExceptionMessage(string $methodType, \Exception $e, AbstractController $object, string $methodName) {
       $messageCallbackFunction = $this->getMethodTypeExceptionMessageCallback()[$methodType];
       switch(true) {
           case (is_callable($messageCallbackFunction)) :
@@ -79,7 +79,7 @@ abstract class AbstractController extends AbstractActionController {
             } catch (\Exception $e) {
                 $response = $this->getResponse();
                 $response->setStatusCode(Response::STATUS_CODE_500);
-                $response->setContent($object->getExceptionMessage('Action'));
+                $response->setContent($object->getExceptionMessage('Action', $e, $object, $methodName));
                 
                 $returnedValue = $response;
             }
@@ -100,7 +100,7 @@ abstract class AbstractController extends AbstractActionController {
   		    try {
 	           $returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
   		    } catch (\Exception $e) {
-  		        return $this->getAjaxResponse(Response::STATUS_CODE_400, $object->getExceptionMessage('Ajax'));
+  		        return $this->getAjaxResponse(Response::STATUS_CODE_400, $object->getExceptionMessage('Ajax', $e, $object, $methodName));
   		    }
 	        if (is_array($returnedValue))
 	            return new JsonModel($returnedValue);
