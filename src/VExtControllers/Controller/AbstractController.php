@@ -21,12 +21,12 @@ abstract class AbstractController extends AbstractActionController {
       if ($triggerError)
           trigger_error('AJAX reponse with code ' . $responseCode . ($additionalMsg === null ? '' : ' - ' . $additionalMsg), E_USER_ERROR);
           
-          $response = $this->getResponse();
-          $response->setStatusCode($responseCode);
-          if ($additionalMsg !== null)
-              $response->setContent($additionalMsg);
-              
-              return $response;
+      $response = $this->getResponse();
+      $response->setStatusCode($responseCode);
+      if ($additionalMsg !== null)
+          $response->setContent($additionalMsg);
+          
+      return $response;
   }
 
   /**
@@ -36,7 +36,7 @@ abstract class AbstractController extends AbstractActionController {
    *
    * @return NULL[]
    */
-  protected function getMethodTypesConfig() {
+  protected function getMethodTypesConfig($exceptionMethodTrace = false) {
   	return [
   		'Action' 			=> function(AbstractController $object, string $methodName) {
   			$methodName .= 'Action';
@@ -50,16 +50,24 @@ abstract class AbstractController extends AbstractActionController {
   		},
 
   		'Ajax'				=> function(AbstractController $object, string $methodName) {
-  		$methodName .= 'Ajax';
-  		
-  		if (!$object->getRequest()->isXmlHttpRequest())
-  		    return $this->getAjaxResponse(Response::STATUS_CODE_400, $object->getRequest()->getUriString() . ' can be called only using XML HTTP Request (AJAX)');
-  		    
+      		$methodName .= 'Ajax';
+      		
+      		if (!$object->getRequest()->isXmlHttpRequest())
+      		    return $this->getAjaxResponse(Response::STATUS_CODE_400, $object->getRequest()->getUriString() . ' can be called only using XML HTTP Request (AJAX)');
+      		    
   		    $paramsValidationResult = $object->validateParameters($methodName);
   		    if ($paramsValidationResult === false)
   		        return $this->getAjaxResponse(Response::STATUS_CODE_400, 'At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString());
-  		        
-	        $returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
+  		    
+  		    try {
+	           $returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
+  		    } catch (\Exception $e) {
+//   		        if ($exceptionMethodTrace)
+//   		            $message = $e->getTraceAsString();
+//   		        else 
+  		            $message = 'Exception has been raised on method call';
+  		        return $this->getAjaxResponse(Response::STATUS_CODE_400, $message);
+  		    }
 	        if (is_array($returnedValue))
 	            return new JsonModel($returnedValue);
   		            
