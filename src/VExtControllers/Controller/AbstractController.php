@@ -100,7 +100,7 @@ abstract class AbstractController extends AbstractActionController {
   		    try {
 	           $returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
   		    } catch (\Exception $e) {
-  		        return $this->getAjaxResponse(Response::STATUS_CODE_400, $object->getExceptionMessage('Ajax', $e, $object, $methodName));
+  		        return $this->getAjaxResponse(Response::STATUS_CODE_500, $object->getExceptionMessage('Ajax', $e, $object, $methodName));
   		    }
 	        if (is_array($returnedValue))
 	            return new JsonModel($returnedValue);
