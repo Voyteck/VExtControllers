@@ -28,6 +28,35 @@ abstract class AbstractController extends AbstractActionController {
           
       return $response;
   }
+  
+  /**
+   * Allows to customize callback that will prepare a message sent together with appropriate response code
+   * @return NULL[]
+   */
+  protected function getMethodTypeExceptionMessageCallback() {
+      return [
+          'Ajax'            => function(\Exception $e, AbstractControler $object, string $methodName) {
+              return 'Exception has been raised on method ' . $methodName . ' call';
+          },
+          'Action'          => 'Exception has been raised on action request'
+      ];
+  }
+  
+  protected function getExceptionMessage(string $methodType) {
+      $messageCallbackFunction = $this->getMethodTypeExceptionMessageCallback()[$methodType];
+      switch(true) {
+          case (is_callable($messageCallbackFunction)) :
+              $message = $messageCallbackFunction($e, $object, $methodName);
+              break;
+          case (is_string($messageCallbackFunction)) :
+              $message = $messageCallbackFunction;
+              break;
+          default:
+              $message = "";
+      }
+      
+      return $message;
+  }
 
   /**
    * Returns appropriate method results depending on type of request:
@@ -36,7 +65,7 @@ abstract class AbstractController extends AbstractActionController {
    *
    * @return NULL[]
    */
-  protected function getMethodTypesConfig($exceptionMethodTrace = false) {
+  protected function getMethodTypesConfig() {
   	return [
   		'Action' 			=> function(AbstractController $object, string $methodName) {
   			$methodName .= 'Action';
@@ -45,8 +74,17 @@ abstract class AbstractController extends AbstractActionController {
 	  			trigger_error('At least one of the mandatory parameters was not provided on request ' . $object->getRequest()->getUriString(), E_USER_ERROR);
 	  			return $object->notFoundAction();
 	  		}
-//   			return parent::onDispatch($object->getEvent());
-            return call_user_func_array(array($object, $methodName), $paramsValidationResult);
+            try {
+                $returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
+            } catch (\Exception $e) {
+                $response = $this->getResponse();
+                $response->setStatusCode(Response::STATUS_CODE_500);
+                $response->setContent($object->getExceptionMessage('Action'));
+                
+                $returnedValue = $response;
+            }
+            
+            return $returnedValue;
   		},
 
   		'Ajax'				=> function(AbstractController $object, string $methodName) {
@@ -61,12 +99,8 @@ abstract class AbstractController extends AbstractActionController {
   		    
   		    try {
 	           $returnedValue = call_user_func_array(array($object, $methodName), $paramsValidationResult);
-  		    } catch (\Exception $e) {  
-//   		        if ($exceptionMethodTrace)
-//   		            $message = $e->getTraceAsString();
-//   		        else 
-  		            $message = 'Exception has been raised on method call';
-  		        return $this->getAjaxResponse(Response::STATUS_CODE_400, $message);
+  		    } catch (\Exception $e) {
+  		        return $this->getAjaxResponse(Response::STATUS_CODE_400, $object->getExceptionMessage('Ajax'));
   		    }
 	        if (is_array($returnedValue))
 	            return new JsonModel($returnedValue);
